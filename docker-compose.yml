@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres
+    user: postgres
+    volumes:
+      - "pgdata:/var/lib/postgresql/data"
+    environment:
+      POSTGRES_PASSWORD: "postgresql"
+    ports:
+      - 5432:5432
+  web:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    volumes:
+      - "./backend:/var/www/public_html"
+    ports:
+      - "8080:80"
+
+volumes:
+  pgdata:

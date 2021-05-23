@@ -1,0 +1,7 @@
+/node_modules/
+/game/js/cljs-runtime
+
+.DS_Store
+.shadow-cljs
+.cpcache
+.lsp

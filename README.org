@@ -1,0 +1,163 @@
+#+title: Beecat
+
+* Intro
+
+* Scoring
+
+Max score
+
+#+begin_quote
+Ranks are based on a percentage of possible points in a puzzle.
+#+end_quote
+
+
+#+begin_src clojure
+(def ranks
+  {0   "Beginner"
+   5   "Good Start"
+   12  "Moving up"
+   19  "Good"
+   35  "Solid"
+   59  "Nice"
+   94  "Great"
+   118 "Amazing"
+   165 "Genius"})
+#+end_src
+
+#+RESULTS:
+: #'beecat.game.machine/ranks
+
+Example Wordlist
+
+#+begin_src clojure
+(def answers
+  ["awarding"
+   "drawing"
+   "warding"
+   "award"
+   "awing"
+   "awning"
+   "dawn"
+   "dawning"
+   "draw"
+   "drawn"
+   "gnaw"
+   "gnawing"
+   "indrawn"
+   "inward"
+   "wadding"
+   "wading"
+   "wagging"
+   "waging"
+   "wand"
+   "waning"
+   "wanna"
+   "ward"
+   "warn"
+   "warning"
+   "warring"
+   "wigging"
+   "wigwag"
+   "wigwagging"
+   "wind"
+   "winding"
+   "windward"
+   "wing"
+   "wingding"
+   "winging"
+   "wining"
+   "winning"
+   "wiring"
+   "wring"
+   "wringing"])
+#+end_src
+
+#+RESULTS:
+: #'beecat.game.machine/answers
+
+Pangrams
+
+#+begin_src clojure
+(def pangrams #{"awarding" "drawing" "warding"})
+#+end_src
+
+#+RESULTS:
+: #'beecat.game.machine/pangrams
+
+Valid letters
+
+#+begin_src clojure
+(def letters ["w","a","d","g","i","n","r"])
+#+end_src
+
+Required letter
+
+#+begin_src clojure
+(def required-letter "w")
+#+end_src
+
+Observed points
+
+#+begin_src clojure
+(def points
+  {"Wand"     1
+   "Windward" 8
+   "Drawn"    5
+   "Gnaw"     1
+   "Gnawing"  7})
+#+end_src
+
+** Breakdown
+
+- 4 letter words are worth 1 point
+- > 4 letter words are worth their length
+- Pangrams are worth 7 + their length
+- Genius is 70% of total points
+  
+** Test
+
+#+begin_src clojure
+(defn score-word
+  [word]
+  (let [length (count word)]
+    (cond
+      (contains? pangrams word)
+      (+ 7 length)
+
+      (> length 4)
+      length
+
+      :else
+      1)))
+
+(def total
+  (->> answers
+       (map score-word)
+       (reduce + 0)))
+#+end_src
+
+#+RESULTS:
+| #'beecat.game.machine/score-word |
+| #'beecat.game.machine/total      |
+
+
+Figure out rank percentages 
+
+#+begin_src clojure
+(->> ranks
+     (map (fn [[words rank]]
+            [(/ words total) rank]))
+     (sort-by first)
+     (into []))
+#+end_src
+
+#+RESULTS:
+|                   0 | Beginner   |
+| 0.02127659574468085 | Good Start |
+| 0.05106382978723404 | Moving up  |
+| 0.08085106382978724 | Good       |
+| 0.14893617021276595 | Solid      |
+|   0.251063829787234 | Nice       |
+|                 0.4 | Great      |
+|   0.502127659574468 | Amazing    |
+|  0.7021276595744681 | Genius     |

@@ -1,0 +1,20 @@
+;; shadow-cljs configuration
+{:source-paths
+ ["src"]
+
+ :dependencies
+ [[reagent/reagent "1.0.0" :exclusions [cljsjs/react cljsjs/react-dom]]
+  [kitchen-async/kitchen-async "0.1.0-SNAPSHOT"]
+  [cljs-css-modules/cljs-css-modules "0.2.1"]]
+
+ :dev-http
+ {8000 {:root "game"
+        :proxy-url "http://localhost:8080"}}
+
+ :builds
+ {:game {:target :browser
+         :output-dir "game/js"
+         :asset-path "js"
+         :modules {:beecat {:init-fn beecat.game.main/-main}}
+         :devtools {:before-load beecat.game.main/stop
+                    :after-load beecat.game.main/start}}}}
