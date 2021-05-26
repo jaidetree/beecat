@@ -25,12 +25,18 @@
      :font-weight "bold"
      :font-size "1.3rem"
      :text-anchor "middle"
-     :text-transform "uppercase"}]]
+     :text-transform "uppercase"
+     :opacity 1
+     :transition "opacity 500ms ease-in-out"}]]
   [:.centercomb
    [:.fill
     {:fill "var(--accent)"}]
    [:.letter
     {:fill "var(--bg)"}]]
+  [:.fade-out
+   [:.outer
+    [:.letter
+     {:opacity 0}]]]
   [".honeycomb:nth-child(1)"
    {:transform "translate(-75%, -50%)"}]
   [".honeycomb:nth-child(2)"
@@ -43,6 +49,7 @@
    {:transform "translate(0, 100%)"}]
   [".honeycomb:nth-child(6)"
    {:transform "translate(-75%, 50%)"}]
+
   [:.word
    {:position :relative
     :width "16.25rem; /* 260px */"

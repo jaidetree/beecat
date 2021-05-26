@@ -485,3 +485,29 @@ body {
   animation: ascend 500ms 800ms ease-in-out both;
   transform: translateY(0);
 }
+
+@keyframes fade-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.fade-out {
+  animation: fade-out 1000ms 0ms ease-in-out both;
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fade-in 500ms 0ms ease-in-out both;
+}

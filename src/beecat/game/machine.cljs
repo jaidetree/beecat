@@ -5,6 +5,41 @@
    [framework.fsm :as fsm]
    [beecat.game.store :as store]))
 
+(defn shuffle-machine
+  [{:keys [letters on-shuffle on-done]}]
+  (fsm/create
+   {:id "shuffle"
+    :initial :init
+    :context {:timer nil
+              :letters letters}
+    :states
+    {:init
+     {:<-
+      (fn [context _event send]
+        (merge context
+               {:timer
+                (js/setTimeout
+                 #(send :hide nil)
+                 0)}))
+
+      :hide
+      (fn [context _event send]
+        (js/requestAnimationFrame
+         identity)
+        [:hidden (merge context
+                        {:timer (js/setTimeout
+                                 #(send :shuffle nil)
+                                 500)})])}
+
+     :hidden
+     {:shuffle
+      (fn [context _event _send]
+        (on-shuffle (shuffle (:letters context)))
+        [:visible (merge context
+                         {:timer (js/setTimeout
+                                  on-done
+                                  500)})])}}}))
+
 (defn completed?
   [answers words]
   (>= (/ (count words) (count answers)) 0.75))
@@ -107,9 +142,22 @@
     (when (contains? (:letters context) letter)
       (assoc context :word (str (:word context) letter)))))
 
-(defn on-shuffle
+(defn ready->on-shuffle
+  [context _event send]
+  [:shuffle (merge context
+                   {:transition (shuffle-machine
+                                 {:letters (:outer-letters context)
+                                  :on-shuffle #(send :update %)
+                                  :on-done    #(send :ready nil)})})])
+
+(defn shuffle->on-update
+  [context letters _send]
+  (assoc context :outer-letters letters))
+
+(defn shuffle->on-ready
   [context _event _send]
-  (assoc context :outer-letters (shuffle (:outer-letters context))))
+  (fsm/destroy (:transition context))
+  [:ready (dissoc context :transition)])
 
 (defn on-delete
   [context _event _send]
@@ -186,24 +234,27 @@
      {:letter on-letter
       :submit on-submit
       :delete on-delete
-      :shuffle on-shuffle}
+      :shuffle ready->on-shuffle}
 
      :accepted
      {:<- on-accepted
       :submit on-submit
       #_#_:letter on-letter
-      :delete on-delete
-      :shuffle on-shuffle
+      #_#_:delete on-delete
       :ready  accepted->on-ready}
 
      :rejected
      {#_#_:letter on-rejected-letter
       :ready  *->ready}
 
-     40 +
+     :shuffle
+     {:update shuffle->on-update
+      :ready shuffle->on-ready}
+
      :completed
      {}}}))
 
 (comment
+  (conj #{} "taffy")
   (get @store/state :words)
-  (get-in @game-machine [:context :word]))
+  (get-in @game-machine [:context]))

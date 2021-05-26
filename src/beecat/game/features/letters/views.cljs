@@ -91,32 +91,45 @@
           letter])]]]))
 
 (defn honeycomb
-  [{:keys [letter is-center]}]
+  [{:keys [letter is-center class-names]}]
   [:svg
    {:class (r/class-names
             (:honeycomb style)
-            (when is-center
-              (:centercomb style)))
+            (if is-center
+              (:centercomb style)
+              "outer"))
     :view-box "0 0 120 106"
     :on-click #(fsm/send game-machine :letter letter)}
    [:polygon.fill
     {:points "0,50 30,0 90,0 120,50 90,100 30,100"}]
    [:text.letter
-    {:x "50%"
+    {:class (r/class-names class-names)
+     :x "50%"
      :y "50%"
      :dy "4%"}
     letter]])
 
+(defn shuffle-transition
+  [{:keys [state]}]
+  (case state
+    :hidden "fade-out"
+    :visible "fade-in"
+    nil))
+
 (defn honeycombs
   []
   (let [state (get @game-machine :state)
-        {:keys [outer-letters required-letter]} (get @game-machine :context)]
+        {:keys [outer-letters required-letter transition]} (get @game-machine :context)
+        transition (when transition @transition)]
     [:div
-     {:class (:honeycombs style)}
+     {:class (r/class-names
+              (:honeycombs style))}
      (for [letter outer-letters]
        [honeycomb
         {:key letter
-         :letter letter}])
+         :letter letter
+         :class-names [(when (= state :shuffle)
+                         (shuffle-transition transition))]}])
      [honeycomb
       {:letter required-letter
        :is-center true}]]))
