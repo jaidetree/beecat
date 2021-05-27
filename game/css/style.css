@@ -361,8 +361,9 @@ template {
   --ok: #71d983;
   --error: #b03371;
   --warning: #ed8a29;
-  --text: #fff;
+  --text: #ccc;
   --darken: rgba(0, 0, 0, 0.2);
+  --med: #444444;
 
   --mono: "Roboto Mono", monospace;
   --sans-serif: Roboto, sans-serif;

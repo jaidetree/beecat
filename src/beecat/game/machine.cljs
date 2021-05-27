@@ -63,30 +63,6 @@
       :else
       [1            "Nice"])))
 
-(def ranks
-  {0.8  "Super Genius"
-   0.7  "Genius"
-   0.5  "Amazing"
-   0.4  "Great"
-   0.25 "Nice"
-   0.14 "Solid"
-   0.08 "Good"
-   0.05 "Moving Up"
-   0.02 "Good Start"
-   0.00 "Beginner"})
-
-(defn rank-score
-  [answers words]
-  (let [total (count answers)
-        found (count words)
-        percent (/ found total)]
-    (->> ranks
-         (keep
-          (fn [[min rank]]
-            (when (>= percent min)
-              rank)))
-         (first))))
-
 (defn validate-word
   [{:keys [answers words required-letter word]}]
   (cond

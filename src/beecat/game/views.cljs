@@ -3,7 +3,8 @@
    [beecat.game.styles :refer [style]]
    [beecat.game.machine :refer [game-machine]]
    [beecat.game.common.views :refer [spinner]]
-   [beecat.game.features.letters.views :refer [actions honeycombs word]]))
+   [beecat.game.features.letters.views :refer [actions honeycombs word]]
+   [beecat.game.features.rank.views :refer [rank]]))
 
 (defn game
   []
@@ -22,6 +23,7 @@
           :color  :dark}]
         [:div
          {:class (:game style)}
+         [rank]
          [word]
          [honeycombs]
          [actions]]))]])
