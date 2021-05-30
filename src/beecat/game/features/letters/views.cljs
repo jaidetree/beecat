@@ -5,74 +5,41 @@
    [beecat.game.machine :refer [game-machine]]
    [beecat.game.features.letters.styles :refer [style]]))
 
-(defn msg-machine
-  []
-  (fsm/create
-   {:initial :init
-    :context {:top -10}
-    :states
-    {:init
-     {:<-
-      (fn [context _event send]
-        {:timer
-         (js/setTimeout
-          #(send :enter nil)
-          0)})
-      :enter
-      (fn [context _event send]
-        [:active (assoc
-                  context
-                  :timer (js/setTimeout
-                          #(send :close nil)
-                          1500))])}
-     :active
-     {:close
-      (fn [context _event _send]
-        (js/clearTimeout (get context :timer))
-        [:closing (assoc
-                   context
-                   :timer (js/setTimeout
-                           #(fsm/send game-machine :ready nil)
-                           250))])}}}))
-
 (defn rejected
-  [{:keys [message]}]
-  (r/with-let [m (msg-machine)]
-    (let [state (get @m :state)]
-      [:div
-       {:class (r/class-names
-                (:message style)
-                (:rejected style)
-                (when (= state :active)
-                  "active"))}
-       (:message message)])
-    (finally
-      (fsm/destroy m))))
+  [{:keys [message machine]}]
+  (let [state (get @machine :state)]
+    [:div
+     {:class (r/class-names
+              (:message style)
+              (:rejected style)
+              (when (= state :active)
+                "active"))}
+     (:message message)]))
 
 (defn accepted
-  [{:keys [message]}]
-  (r/with-let [m (msg-machine)]
-    (let [state (get @m :state)]
-      [:div
-       {:class (r/class-names
-                (:message style)
-                (:accepted style)
-                (when (= state :active)
-                  "active"))}
-       (:message message)])
-    (finally
-      (fsm/destroy m))))
+  [{:keys [message machine]}]
+  (println "accepted message" message)
+  (let [state (get @machine :state)]
+    [:div
+     {:class (r/class-names
+              (:message style)
+              (:accepted style)
+              (when (= state :active)
+                "active"))}
+     (:message message)]))
 
 (defn word
   []
   (let [{:keys [state context]} @game-machine
-        {:keys [message required-letter word]} context]
+        {:keys [message required-letter word machine]} context]
     [:div
      {:class (:word style)}
      (when (= state :rejected)
-       [rejected {:message message}])
+       [rejected {:message message
+                  :machine machine}])
      (when (= state :accepted)
-       [accepted {:message message}])
+       [accepted {:message message
+                  :machine machine}])
      [:div.input
       {:class (case state
                 :rejected "shake"
@@ -110,26 +77,27 @@
     letter]])
 
 (defn shuffle-transition
-  [{:keys [state]}]
-  (case state
-    :hidden "fade-out"
-    :visible "fade-in"
-    nil))
+  [machine]
+  (let [{:keys [state]} @machine]
+    (case state
+      :hidden "fade-out"
+      :visible "fade-in"
+      nil)))
 
 (defn honeycombs
   []
-  (let [state (get @game-machine :state)
-        {:keys [outer-letters required-letter transition]} (get @game-machine :context)
-        transition (when transition @transition)]
+  (let [{:keys [state context]} @game-machine
+        {:keys [outer-letters required-letter machine]} context]
     [:div
      {:class (r/class-names
               (:honeycombs style))}
-     (for [letter outer-letters]
-       [honeycomb
-        {:key letter
-         :letter letter
-         :class-names [(when (= state :shuffle)
-                         (shuffle-transition transition))]}])
+     (doall
+      (for [letter outer-letters]
+        [honeycomb
+         {:key letter
+          :letter letter
+          :class-names [(when (= state :shuffle)
+                          (shuffle-transition machine))]}]))
      [honeycomb
       {:letter required-letter
        :is-center true}]]))

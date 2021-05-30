@@ -39,6 +39,35 @@
                          {:timer (js/setTimeout
                                   on-done
                                   500)})])}}}))
+(defn msg-machine
+  [{:keys [send-parent]}]
+  (fsm/create
+   {:initial :init
+    :context {:top -10}
+    :states
+    {:init
+     {:<-
+      (fn [context _event send]
+        {:timer
+         (js/setTimeout
+          #(send :enter nil)
+          0)})
+      :enter
+      (fn [context _event send]
+        [:active (assoc
+                  context
+                  :timer (js/setTimeout
+                          #(send :close nil)
+                          1500))])}
+     :active
+     {:close
+      (fn [context _event _send]
+        (js/clearTimeout (get context :timer))
+        [:closing (assoc
+                   context
+                   :timer (js/setTimeout
+                           #(send-parent :ready nil)
+                           250))])}}}))
 
 (defn completed?
   [answers words]
@@ -104,9 +133,7 @@
 
 (defn loading->ready
   [context response _send]
-  (let [{:keys [validLetters outerLetters centerLetter answers
-                pangrams]} response
-        pangrams (set pangrams)]
+  (let [{:keys [validLetters outerLetters centerLetter]} response]
     [:ready (assoc context
                    :letters (set validLetters)
                    :outer-letters (set outerLetters)
@@ -121,10 +148,10 @@
 (defn ready->on-shuffle
   [context _event send]
   [:shuffle (merge context
-                   {:transition (shuffle-machine
-                                 {:letters (:outer-letters context)
-                                  :on-shuffle #(send :update %)
-                                  :on-done    #(send :ready nil)})})])
+                   {:machine (shuffle-machine
+                              {:letters (:outer-letters context)
+                               :on-shuffle #(send :update %)
+                               :on-done    #(send :ready nil)})})])
 
 (defn shuffle->on-update
   [context letters _send]
@@ -132,8 +159,8 @@
 
 (defn shuffle->on-ready
   [context _event _send]
-  (fsm/destroy (:transition context))
-  [:ready (dissoc context :transition)])
+  (fsm/destroy (:machine context))
+  [:ready (dissoc context :machine)])
 
 (defn on-delete
   [context _event _send]
@@ -141,13 +168,15 @@
     (assoc context :word (subs word 0 (dec (count word))))))
 
 (defn on-submit
-  [context _event _send]
+  [context _event send]
   (let [{:keys [required-letter word]} context
         {:keys [answers words]} @store/state
         [is-valid msg] (validate-word {:answers         answers
                                        :words           words
                                        :required-letter required-letter
-                                       :word            word})]
+                                       :word            word})
+        machine (msg-machine {:send-parent send})
+        context (assoc context :machine machine)]
     (if is-valid
       [:accepted context]
       [:rejected (assoc context
@@ -200,7 +229,7 @@
    {:id      :game
     :initial :loading
     :context {:word ""
-              :score 0}
+              :score nil}
     :states
     {:loading
      {:init  on-init

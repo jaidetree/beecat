@@ -1,6 +1,7 @@
 (ns beecat.game.features.rank.views
   (:require
    [beecat.game.store :as store]
+   [beecat.game.machine :refer [game-machine]]
    [beecat.game.features.rank.styles :refer [style]]))
 
 (def ranks
@@ -56,7 +57,6 @@
   (let [{:keys [answers words]} @store/state
         score (calc-score answers words)
         rank (score->rank score)]
-    (println {:score score})
     [:div
      {:class (:rank style)}
      [label
@@ -65,3 +65,21 @@
      [progress
       {:rank rank
        :score score}]]))
+
+(defn score
+  []
+  (let [{:keys [context]} @game-machine
+        {:keys [score machine]} context]
+    [:section
+     {:class (:score style)}
+     (when score
+       (let [{:keys [state]} @machine]
+         [:span.points
+          {:class (case state
+                    :active "active"
+                    :closing "active closing"
+                    "")}
+          (str "+ " score)]))]))
+
+(comment
+  (get-in @game-machine [:context :score]))
