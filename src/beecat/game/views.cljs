@@ -5,7 +5,8 @@
    [beecat.game.common.views :refer [spinner]]
    [beecat.game.features.letters.views :refer [actions honeycombs word]]
    [beecat.game.features.rank.views :refer [rank score]]
-   [beecat.game.features.words.views :refer [words]]))
+   [beecat.game.features.words.views :refer [words]]
+   [beecat.game.features.modal.views :refer [modal-viewport]]))
 
 (defn game
   []
@@ -26,7 +27,7 @@
          {:class (:game style)}
          [rank]
          [words]
-         [score]
          [word]
          [honeycombs]
-         [actions]]))]])
+         [actions]]))
+    [modal-viewport]]])

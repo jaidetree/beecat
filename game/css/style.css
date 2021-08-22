@@ -1,5 +1,7 @@
 /*! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css */
 
+@import url("https://fonts.googleapis.com/css2?family=Dosis:wght@300;400;600&family=Oleo+Script+Swash+Caps&display=swap");
+
 /* Document
    ========================================================================== */
 
@@ -354,19 +356,29 @@ template {
  ******************************************************************************/
 
 :root {
-  --primary: #879dc1;
   --accent: #fff019;
   --text: #ffffff;
   --bg: #000000;
   --ok: #71d983;
   --error: #b03371;
   --warning: #ed8a29;
-  --text: #ccc;
   --darken: rgba(0, 0, 0, 0.2);
+  --light: #555555;
   --med: #444444;
+  --black-5: #f2f2f2;
+  --black-10: #e6e6e6;
+  --black-20: #cccccc;
+  --black-30: #b3b3b3;
+  --black-40: #999999;
+  --black-50: #808080;
+  --black-60: #666666;
+  --black-70: #4d4d4d;
+  --black-80: #333333;
+  --black-90: #1a1a1a;
+  --black-100: #000000;
 
-  --mono: "Roboto Mono", monospace;
-  --sans-serif: Roboto, sans-serif;
+  --display-font: "Oleo Script Swash Caps", cursive;
+  --body-font: "Dosis", sans-serif;
 }
 
 body {
@@ -374,6 +386,7 @@ body {
   color: var(--text);
   padding: 0;
   margin: 0;
+  font-family: var(--body-font);
 }
 
 /* Module

@@ -17,6 +17,17 @@
   [xs]
   (.fromArray bacon (clj->js xs)))
 
+(defn from-atom
+  [atom]
+  (.fromBinder bacon
+               (fn source [sink]
+                 (let [key (str "from-atom-" (js/Date.now))]
+                   (add-watch atom key
+                              (fn [_key _ref _prev next]
+                                (sink next)))
+                   (fn cleanup []
+                     (remove-watch atom key))))))
+
 (defn merge-all
   [streams]
   (apply (.-mergeAll bacon) streams))

@@ -22,6 +22,14 @@
               {:type :machine/send
                :payload [:ready response]}))))
 
+(defn deserialize-fx
+  [actions _deps]
+  (-> actions
+      (of-type :populate)
+      (.map nil)
+      (type->action :words/deserialize)))
+
 (def fx
   (compose-fx [populate-state-fx
-               populate-fsm-fx]))
+               populate-fsm-fx
+               deserialize-fx]))

@@ -16,6 +16,7 @@
      :padding 0
      :display :flex
      :flex-flow "row nowrap"
+     :height "calc(1.25rem + 1rem + 2px)"
      :border "1px solid var(--med)"}]
    [:.word
     {:padding "0.5rem"}]])

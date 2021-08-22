@@ -22,6 +22,8 @@
           (assoc state slice-key #(reducer ::undefined action)))
         state)))
 
+(def init {:type ::init :payload nil})
+
 (defn assign-reducers
   [{:keys [initial reducers]}]
   (fn created-reducer
@@ -30,9 +32,15 @@
          (reduce
           (fn created-reduce
             [state [action-type reducer]]
-            (if (= (:type action) action-type)
+            (cond
+              (= action init)
+              initial
+
+              (= (:type action) action-type)
               (reducer (if (= state ::undefined) initial state)
                        (assoc-in action [:meta :initial] initial))
+
+              :default
               state))
           state))))
 
@@ -43,7 +51,7 @@
     (->> reducer-slices
          (reduce (fn slice-reduce
                    [state [slice-key reducer]]
-                   (update state slice-key #(reducer % action)))
+                   (assoc state slice-key (reducer (get state slice-key ::undefined) action)))
                  state))))
 
 (defn of-type?
@@ -81,3 +89,5 @@
       (.map (fn [payload]
               {:type type
                :payload payload}))))
+
+(def action* type->action)

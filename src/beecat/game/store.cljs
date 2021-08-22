@@ -2,7 +2,7 @@
   (:require
    [reagent.core :as r]
    [framework.stream :refer [log Bus]]
-   [framework.reactor :refer [reduce-state of-type compose-fx combine-reducers]]
+   [framework.reactor :refer [init reduce-state of-type compose-fx combine-reducers]]
    [beecat.game.features.initialize.store :as initialize]
    [beecat.game.features.answers.store :as answers]
    [beecat.game.features.words.store :as words]
@@ -25,12 +25,13 @@
 
 (def store-fx
   (compose-fx
-   [log-actions-fx
+   [#_log-actions-fx
     requests/fx
     letters/fx
-    initialize/fx]))
+    initialize/fx
+    words/fx]))
 
-(defonce state (r/atom {}))
+(defonce state (r/atom (store-reducer {} init)))
 (defonce actions (Bus.))
 (defonce unsubscribe (atom (constantly nil)))
 

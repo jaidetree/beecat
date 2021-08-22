@@ -3,6 +3,7 @@
    [clojure.string :as s]
    [framework.reactor :refer [of-type pluck]]
    [framework.fsm :as fsm]
+   [beecat.game.features.modal.machine :as modal]
    [beecat.game.store :as store]))
 
 (defn shuffle-machine
@@ -51,7 +52,7 @@
         {:timer
          (js/setTimeout
           #(send :enter nil)
-          0)})
+          10)})
       :enter
       (fn [context _event send]
         [:active (assoc
@@ -70,15 +71,15 @@
                            250))])}}}))
 
 (defn completed?
-  [answers words]
-  (>= (/ (count words) (count answers)) 0.75))
+  [percent]
+  (= percent 1.0))
 
 (defn score-word
   [pangrams word]
   (let [length (count word)]
     (cond
-      (contains? pangrams word)
-      [(+ 7 length) "Whoa! Look at you"]
+      (contains? (set pangrams) word)
+      [(+ 7 length) "Ooh a pangram"]
 
       (> length 8)
       [length       "wow"]
@@ -91,6 +92,12 @@
 
       :else
       [1            "Nice"])))
+
+(defn calc-score
+  [answers words]
+  (let [total (count answers)
+        found (count words)]
+    (/ found total)))
 
 (defn validate-word
   [{:keys [answers words required-letter word]}]
@@ -121,7 +128,7 @@
   (store/dispatch
    {:type :request/pending
     :payload {:name :state
-              :url "/api/words.clj"
+              :url "/data/game.json"
               :method "get"}})
   (assoc context
          :unubscribe (-> store/actions
@@ -138,6 +145,12 @@
                    :letters (set validLetters)
                    :outer-letters (set outerLetters)
                    :required-letter centerLetter)]))
+
+(defn on-sync
+  [context _event _send]
+  (let [{:keys [answers words]} @store/state
+        percent (calc-score answers words)]
+    [:ready (merge context {:progress percent})]))
 
 (defn on-letter
   [context letter _send]
@@ -205,11 +218,13 @@
 (defn accepted->on-ready
   [context _event _send]
   (let [{:keys [answers words]} @store/state
+        percent (calc-score answers words)
         context (assoc context
                        :word ""
                        :message ""
-                       :score nil)]
-    (if (completed? answers words)
+                       :score nil
+                       :progress percent)]
+    (if (completed? percent)
       [:completed context]
       [:ready context])))
 
@@ -237,6 +252,7 @@
 
      :ready
      {:letter on-letter
+      :sync   on-sync
       :submit on-submit
       :delete on-delete
       :shuffle ready->on-shuffle}

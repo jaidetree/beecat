@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "shadow-cljs watch game",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -14,5 +15,10 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "shadow-cljs": "^2.13.0"
+  },
+  "devDependencies": {
+    "cypress": "^8.3.0",
+    "cypress-jest-adapter": "git+https://github.com/eccentric-j/cypress-jest-adapter.git",
+    "expect": "^27.0.6"
   }
 }

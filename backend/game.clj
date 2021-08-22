@@ -14,10 +14,17 @@
             [:head
              [:title
               "Beecat"]
+             [:meta
+              {:name "viewport"
+               :content "width=device-width, initial-scale=1"}]
              [:link
               {:rel "stylesheet"
                :href "/css/style.css"}]]
             [:body
              [:div#game]
              [:script
-              {:src "/js/beecat.js"}]]])))
+              {:src "/js/beecat.js"}]
+             [:script
+              {:src "https://kit.fontawesome.com/1ad808c8ff.js"
+               :crossorigin "anonymous"}]
+             ]])))

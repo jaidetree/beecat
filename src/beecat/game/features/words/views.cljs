@@ -1,17 +1,18 @@
 (ns beecat.game.features.words.views
   (:require
-   [beecat.game.machine :refer [game-machine]]
+   [reagent.core :as r]
    [beecat.game.store :as store]
-   [beecat.game.features.words.styles :refer [style]]
-   [framework.fsm :as fsm]))
+   [beecat.game.features.words.styles :refer [style]]))
 
 (defn words
   []
   (let [found-words (get @store/state :words)]
     [:div
-     {:class (:words style)}
+     {:class (r/class-names
+              (:words style)
+              "words-list")}
      [:ul.list
-      (for [[i word] (map-indexed vector (sort found-words))]
+      (for [[i word] (map-indexed vector found-words)]
         [:li.word
          {:key i}
          word])

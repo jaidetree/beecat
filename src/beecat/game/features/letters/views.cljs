@@ -18,7 +18,6 @@
 
 (defn accepted
   [{:keys [message machine]}]
-  (println "accepted message" message)
   (let [state (get @machine :state)]
     [:div
      {:class (r/class-names
@@ -90,6 +89,7 @@
         {:keys [outer-letters required-letter machine]} context]
     [:div
      {:class (r/class-names
+              "honeycombs"
               (:honeycombs style))}
      (doall
       (for [letter outer-letters]
@@ -105,16 +105,19 @@
 (defn actions
   []
   [:div
-   {:class (:actions actions)}
+   {:class (r/class-names "actions" (:actions style))}
    [:button
     {:type :button
      :on-click #(fsm/send game-machine :delete %)}
-    "Delete"]
+    [:i.fal.fa-backspace]
+    " Delete"]
    [:button
     {:type :button
-     :on-click #(fsm/send game-machine :shuffle %)}
-    "Shuffle"]
+     :on-click #(fsm/send game-machine :shuffle %)
+     :title "Shuffle"}
+    [:i.fal.fa-sync]]
    [:button
     {:type :button
      :on-click #(fsm/send game-machine :submit nil)}
-    "Enter"]])
+    "Enter "
+    [:i.fal.fa-share]]])

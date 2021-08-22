@@ -70,7 +70,7 @@
   [{:keys [state context states] :as fsm-state} f arg send]
   (let [result (f context arg send)
         [next context] (resolve-fsm-state state context result)
-        _ (println "trans" state "->" next context)
+        #_#__ (println "trans" state "->" next context)
         context (exit-transition states state next context arg send)
         context (enter-transition states state next context arg send)]
     (assoc fsm-state

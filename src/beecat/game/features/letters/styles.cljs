@@ -53,7 +53,8 @@
   [:.word
    {:position :relative
     :width "16.25rem; /* 260px */"
-    :margin "auto"}
+    :margin "auto"
+    :margin-top "2rem"}
    [:.letters
     {:position "absolute"
      :left 0
@@ -113,4 +114,13 @@
    [:&:before
     {:border-top-color "var(--accent)"}]
    [:&.active
-    {:transform "translate(-50%, 0)"}]])
+    {:transform "translate(-50%, 0)"}]]
+  [:.actions
+   [:button
+    {:background "var(--accent)"
+     :color "var(--bg)"
+     :border "none"
+     :margin "0 0.5rem"
+     :text-align "center"
+     :padding "0.25rem 1rem"
+     :border-radius "0.5rem"}]])
